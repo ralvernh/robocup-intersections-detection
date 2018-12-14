@@ -6,41 +6,29 @@ LDLIBS=\
 	-lopencv_imgproc\
 	-lopencv_highgui\
 	-lopencv_features2d\
-	-lopencv_nonfree\
 	-lopencv_calib3d\
 	-lopencv_objdetect\
-	-lopencv_flann
-#	-lopencv_imgcodecs
+	-lopencv_flann\
+	-lopencv_imgcodecs	
+	#-lopencv_nonfree
 
 #modify DATA or VIEWER path command if not applicable
 VIEWER= pvisu
-DATA= ../data
-DATA_2= ../data_2
-IMAGE= 072-rgb.png
-IMAGE_2= croix1-rgb.png
+DATA='../data/log1/'
+IMAGE=$(DATA)/143-rgb.png
 
 BIN=\
-	harris_detector \
-	lines-detector \
-	harris_detector_v2 \
-	lines-detector_v2 \
-	lines-detector_v3 \
-	bannnannne \
-	find_picture_motif_homography
+	harris\
+	lines-detector_v3\
 
 
 .PHONY: all clean cleanall
 all: $(BIN)
 
 .PHONY: test
-test: harris_detector lines-detector harris_detector_v2 lines-detector_v2 lines-detector_v3 bannnannne find_picture_motif_homography
-	./harris_detector $(DATA)/$(IMAGE)
-	./lines-detector $(DATA)/$(IMAGE)
-	./harris_detector_v2 $(DATA)/$(IMAGE)
-	./lines-detector_v2 $(DATA)/$(IMAGE)
-	./lines-detector_v3 $(DATA)/$(IMAGE)
-	./bannnannne $(DATA)/$(IMAGE)
-	./find_picture_motif_homography $(DATA)/$(IMAGE) $(DATA_2)/$(IMAGE_2)
+test: 
+	./harris $(IMAGE)
+	#./lines-detector_v3 $(DATA)/$(IMAGE)
 
 #view-2.png
 
