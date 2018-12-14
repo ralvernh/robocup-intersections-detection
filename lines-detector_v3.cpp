@@ -7,18 +7,18 @@
 using namespace cv;
 using namespace std;
 
-int lowThreshold=1;
+int lowThreshold=27; //27
 int const max_lowThreshold = 100;
-int hightThreshold=1;
+int hightThreshold=63; //63
 int const min_hightThreshold = 100;
 
 int low_h=30;
-int low_s=173;
+int low_s=186; //186
 int low_v=0;
 int const max_low_h = 360;
 int const max_low_s = 360;
 int const max_low_v = 360;
-int hight_h=61;
+int hight_h=61; //96
 int hight_s=360;
 int hight_v=210;
 int const min_hight_h = 360;
@@ -35,12 +35,52 @@ Mat src, HSV;
 //  https://docs.opencv.org/2.4/doc/tutorials/imgproc/imgtrans/canny_detector/canny_detector.html
 //  https://www.learnopencv.com/color-spaces-in-opencv-cpp-python/
 
-/*
-void mumuse_HSV(Mat image_rgb){
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+Mat Erosion( Mat image_input ,int erosion_size )
+{
+  Mat image_output;
+  int erosion_type = 0;
+  int erosion_elem = 2;
+
+  if( erosion_elem == 0 ){ erosion_type = MORPH_RECT; }
+  else if( erosion_elem == 1 ){ erosion_type = MORPH_CROSS; }
+  else if( erosion_elem == 2) { erosion_type = MORPH_ELLIPSE; }
+
+  //![kernel]
+  Mat element = getStructuringElement( erosion_type,
+                       Size( 2*erosion_size + 1, 2*erosion_size+1 ),
+                       Point( erosion_size, erosion_size ) );
+  //![kernel]
+
+  /// Apply the erosion operation
+  erode( image_input, image_output, element );
+  //imshow( "Erosion_Demo", image_output );
+  return (image_output);
 }
-*/
-void DetectLines( const char* destName)
+
+
+Mat Dilation( Mat image_input ,int dilation_size )
+{
+  Mat image_output;
+  int dilation_type = 0;
+  int dilation_elem = 2;
+
+  if( dilation_elem == 0 ){ dilation_type = MORPH_RECT; }
+  else if( dilation_elem == 1 ){ dilation_type = MORPH_CROSS; }
+  else if( dilation_elem == 2) { dilation_type = MORPH_ELLIPSE; }
+
+  Mat element = getStructuringElement( dilation_type,
+                       Size( 2*dilation_size + 1, 2*dilation_size+1 ),
+                       Point( dilation_size, dilation_size ) );
+
+  /// Apply the dilation operation
+  dilate( image_input, image_output, element );
+  //imshow( "Dilation_Demo", image_output );
+  return (image_output);
+}
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void DetectLines( )
 {
 
     vector<Mat> hsv_planes;
@@ -59,31 +99,58 @@ void DetectLines( const char* destName)
     //imshow("outpute", whole_green_hue);
     src=whole_green_hue.clone();
     //--------------------------------------------------------------------------
-    Mat cdst;// dst2;
+    Mat cdst;  // dst2;
     //Canny(src, dst, 50, 200, 3);
-
     cvtColor(src, cdst, COLOR_GRAY2BGR);
 
+    int nb_dillations_erosions = 2; //AU PIF !!!
+    for( int k=0; k < nb_dillations_erosions ;k++){
+      src = Dilation( src ,4 );
+    }
+    for( int kk=0; kk<nb_dillations_erosions ;kk++){
+      src = Erosion( src ,4 );
+    }
+
+
+    int rows=cdst.rows;
+    int cols=cdst.cols;
+    Mat image_lignes_rouge(rows,cols,CV_8UC1,Scalar(0,0,0));
+    cvtColor(image_lignes_rouge, image_lignes_rouge, COLOR_GRAY2BGR);
 
     vector<Vec4i> lines;
     //HoughLinesP(dst, lines, 1, CV_PI / 180, 50, 50, 10);
 
-    HoughLinesP(src, lines, 1, CV_PI / 180, lowThreshold, hightThreshold, 10);
+    HoughLinesP(src, lines, 3, CV_PI / 180, lowThreshold, hightThreshold, 10);
     for (size_t i = 0; i < lines.size(); i++)
     {
         Vec4i l = lines[i];
         line(cdst, Point(l[0], l[1]), Point(l[2], l[3]), Scalar(0, 0, 255), 3, 2);
+        line(image_lignes_rouge, Point(l[0], l[1]), Point(l[2], l[3]), Scalar(0, 0, 255), 3, 2);
     }
 
-    //imshow("sourceName", src);
-    imshow(destName, cdst);
+    imshow("sourceName", src);
+    //imshow(destName, cdst);
+    cvtColor(image_lignes_rouge, image_lignes_rouge, COLOR_BGR2GRAY);
+    //Canny(image_lignes_rouge, image_lignes_rouge, 50, 200, 3);
+//---------------------------------------------------------------------------------------------------
+/*
+    int nb_dillations_erosions = 1; //AU PIF !!!
+    for( int k=0; k < nb_dillations_erosions ;k++){
+      image_lignes_rouge = Dilation( image_lignes_rouge ,4 );
+    }
+    for( int kk=0; kk<nb_dillations_erosions ;kk++){
+      image_lignes_rouge = Erosion( image_lignes_rouge ,4 );
+    }
+*/
+//---------------------------------------------------------------------------------------------------
 
+    imshow("whouahh", image_lignes_rouge);
 }
 
 
 void DetectLines_demo( int, void* )
 {
-  DetectLines( "line dest");
+  DetectLines();
 }
 
 void usage (const char *s)
