@@ -47,4 +47,4 @@ test: harris_detector lines-detector harris_detector_v2 lines-detector_v2 lines-
 clean:
 	$(RM) *~ *.png
 cleanall: clean
-	$(RM) $(BIN) *.o *.pdf
+	$(RM) $(BIN) *.o
