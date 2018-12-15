@@ -24,7 +24,8 @@ BIN=\
 	lines-detector_v3 \
 	find_picture_motif_homography \
 	find_picture_motif_homography_v2 \
-	template_matching_opencv
+	template_matching_opencv \
+	template_matching_opencv_v2
 
 #	harris_detector_v2 \
 #	harris_detector \
@@ -37,11 +38,12 @@ BIN=\
 all: $(BIN)
 
 .PHONY: test
-test:   lines-detector_v3  find_picture_motif_homography template_matching_opencv
+test:   lines-detector_v3  find_picture_motif_homography template_matching_opencv template_matching_opencv_v2
 
 	./lines-detector_v3 $(DATA)/$(IMAGE)
 	./find_picture_motif_homography $(DATA)/$(IMAGE) $(DATA_2)/$(IMAGE_2)
 	./template_matching_opencv $(DATA_2)/$(IMAGE) $(DATA_2)/$(IMAGE_2)
+	./template_matching_opencv_v2 $(DATA_2)/$(IMAGE)
 
 #	./harris_detector $(DATA)/$(IMAGE)
 #	./lines-detector $(DATA)/$(IMAGE)
