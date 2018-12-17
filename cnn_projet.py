@@ -31,50 +31,122 @@ from scipy import misc
 
 LABELS = ['Croix', 'T', 'Angles']
 
-IMAGE_PATH = r"C:\Users\Romain\Desktop\Outils_d_imagerie_pour_la_robotique\PROJET_OUTILS_DIMAGERIE_ROB\data_2"
+IMAGE_ANGLES_PATH = r"C:\Users\Romain\Desktop\Outils_d_imagerie_pour_la_robotique\PROJET_OUTILS_DIMAGERIE_ROB\IMAGES\Angles"
+IMAGE_CROIX_PATH = r"C:\Users\Romain\Desktop\Outils_d_imagerie_pour_la_robotique\PROJET_OUTILS_DIMAGERIE_ROB\IMAGES\Croix"
+IMAGE_T_PATH = r"C:\Users\Romain\Desktop\Outils_d_imagerie_pour_la_robotique\PROJET_OUTILS_DIMAGERIE_ROB\IMAGES\Ts"
+IMAGE_RIEN_PATH = r"C:\Users\Romain\Desktop\Outils_d_imagerie_pour_la_robotique\PROJET_OUTILS_DIMAGERIE_ROB\IMAGES\rien"
 
-file_paths = glob.glob(path.join(IMAGE_PATH, '*.png'))
+file_paths_angles = glob.glob(path.join(IMAGE_ANGLES_PATH, '*.png'))
+file_paths_croix = glob.glob(path.join(IMAGE_CROIX_PATH, '*.png'))
+file_paths_T = glob.glob(path.join(IMAGE_T_PATH, '*.png'))
+file_paths_rien = glob.glob(path.join(IMAGE_RIEN_PATH, '*.png'))
 
+# regrouper les chemins
+file_paths=[]
+file_paths.append(file_paths_angles)
+file_paths.append(file_paths_croix)
+file_paths.append(file_paths_T)
+file_paths.append(file_paths_rien)
 
 # Load the images
-images = [misc.imread(path) for path in file_paths]
-images = np.asarray(images)
+images_angles = [misc.imread(path) for path in file_paths_angles]
+images_angles = np.asarray(images_angles)
+#-----------------
+images_croix = [misc.imread(path) for path in file_paths_croix]
+images_croix = np.asarray(images_croix)
+#-----------------
+images_T = [misc.imread(path) for path in file_paths_T]
+images_T = np.asarray(images_T)
+#-----------------
+images_rien = [misc.imread(path) for path in file_paths_rien]
+images_rien = np.asarray(images_rien)
+#-----------------
 
 # Get image size
-image_size = np.asarray([images.shape[1], images.shape[2], images.shape[3]])
-print(image_size)
+image_size_angles = np.asarray([images_angles.shape[1], images_angles.shape[2], images_angles.shape[3]])
+print(image_size_angles)
+#-----------------
+image_size_croix = np.asarray([images_croix.shape[1], images_croix.shape[2], images_croix.shape[3]])
+print(image_size_croix)
+#-----------------
+image_size_T = np.asarray([images_T.shape[1], images_T.shape[2], images_T.shape[3]])
+print(image_size_T)
+#-----------------
+image_size_rien = np.asarray([images_rien.shape[1], images_rien.shape[2], images_rien.shape[3]])
+print(image_size_rien)
+#-----------------
 
 # Scale
-images = images / 255
+images_angles = images_angles / 255
+#-----------------
+images_croix = images_croix / 255
+#-----------------
+images_T = images_T / 255
+#-----------------
+images_rien = images_rien / 255
+#-----------------
+
+n_images_angles = images_angles.shape[0]
+n_images_croix = images_croix.shape[0]
+n_images_T = images_T.shape[0]
+n_images_rien = images_rien.shape[0]
+
+#regrouper toutes les images
+images=[]
+images.append([images_angles])
+images.append([images_croix])
+images.append([images_T])
+images.append([images_rien])
+
+#regrouper les tailles des images
+tailles_immmages=[]
+tailles_immmages.append([n_images_angles])
+tailles_immmages.append([n_images_croix])
+tailles_immmages.append([n_images_T])
+tailles_immmages.append([n_images_rien])
 
 # Read the labels from the filenames
 n_images = images.shape[0]
-labels = np.zeros(n_images)
+labels = np.zeros(len(tailles_immmages)-1)
 
-for i in range(n_images):
-    filename = path.basename(file_paths[i])[0]
-    labels[i] = int(filename[0])
-    # 0: "croix", 1: "T", 2: "angle"
+#----------------------------------------------------------------------------
+for(j in range(len(tailles_immmages)-1)):
+    for i in range(tailles_immmages[j]):
+        filename = path.basename(file_paths[j][i])[0]
+        if(filename[0]="r"):   # rgb: que_dalle -> 3
+            labels[j][i] = 3
+        else:
+            labels[j][i] = int(filename[0])
+        # 0: "croix", 1: "T", 2: "angle", rgb -> 3: que_dalle
+#----------------------------------------------------------------------------
+
     
  # Split into test and training sets
 TRAIN_TEST_SPLIT = 0.9
 
-# Split at the given index
-split_index = int(TRAIN_TEST_SPLIT * n_images)
-shuffled_indices = np.random.permutation(n_images)
-train_indices = shuffled_indices[0:split_index]
-test_indices = shuffled_indices[split_index:]
 
-# Split the images and the labels
-x_train = images[train_indices, :, :]
-y_train = labels[train_indices]
-x_test = images[test_indices, :, :]
-y_test = labels[test_indices]
+compteur=0
+x_train = []
+y_train = []
+x_test = []
+y_test = []
 
-
-
-
-
+for(j in range(len(tailles_immmages)-1)):
+    i = tailles_immmages[j]
+    # Split at the given index
+    split_index = int(TRAIN_TEST_SPLIT * i)
+    shuffled_indices = np.random.permutation(i)
+        
+    # 0%-90% -> train   90%-100% -> test
+    train_indices = shuffled_indices[0:split_index]
+    test_indices = shuffled_indices[split_index:]
+    
+    # Split the images and the labels
+    #(NB: "list.extend(list2)" adds the elements in "list2" to the end of the "list". donc != .append() )
+    x_train.extend( images[j][train_indices, :, :] )
+    y_train.extend( labels[j][train_indices] )
+    x_test.extend( images[j][test_indices, :, :] )
+    y_test.extend( labels[j][test_indices] )
 
 
 
@@ -95,14 +167,17 @@ model.add(Flatten())
 model.add(Dense(units=128,activation="relu",input_shape=(784,)))
 model.add(Dense(units=128,activation="relu"))
 model.add(Dense(units=128,activation="relu"))
-model.add(Dense(units=3,activation="softmax"))
+model.add(Dense(units=4,activation="softmax"))
 # Compiling the CNN
 model.compile(optimizer = 'adam', loss = 'binary_crossentropy', metrics = ['accuracy'])
 
+# time to work and so to ...TRAIN!!!!
+model.fit(train_x,train_y,batch_size=32,epochs=20,verbose=1)
 
-# Instantiate the model
-model = cnn(size=image_size, n_layers=N_LAYERS)
 
+
+# ou:
+"""
 # Training hyperparamters
 EPOCHS = 150
 BATCH_SIZE = 200
@@ -122,9 +197,7 @@ callbacks = [early_stopping, tensorboard]
 
 # Train the model !!!!!!
 model.fit(x_train, y_train, epochs=EPOCHS, batch_size=BATCH_SIZE, callbacks=callbacks, verbose=0)
-
-# ou:
-# model.fit(train_x,train_y,batch_size=32,epochs=10,verbose=1)
+"""
 
 
 #_________________________________________MODEL_EVALUATION_______________________________________________________________________________________________________________________________________________________________________________________________________________________
@@ -135,7 +208,7 @@ model.fit(x_train, y_train, epochs=EPOCHS, batch_size=BATCH_SIZE, callbacks=call
 test_predictions = model.predict(x_test)
 test_predictions = np.round(test_predictions)
 
-#récupérer les classes de la base de test (0 ou 1 ou 2)
+#récupérer les classes de la base de test (0 ou 1 ou 2 ou 3)
 img = y_test[130]
 test_img = img.reshape((1,784))
 
@@ -156,11 +229,82 @@ print("Accuracy: " + str(accuracy))
 TEMPLATES_PATH = r"C:\Users\Romain\Desktop\Outils_d_imagerie_pour_la_robotique\PROJET_OUTILS_DIMAGERIE_ROB\super_templates"
 
 """
+
+
+
+def visualise_image_I(i, x_test, y_test, test_predictions, image, label_indices_cross, label_indices_T, label_indices_angle, LABELS):
+
+    TEMPLATE_CROSS_PATH = r"C:\Users\Romain\Desktop\Outils_d_imagerie_pour_la_robotique\PROJET_OUTILS_DIMAGERIE_ROB\super_templates\img13.jpg"
+
+    TEMPLATE_T_PATH = r"C:\Users\Romain\Desktop\Outils_d_imagerie_pour_la_robotique\PROJET_OUTILS_DIMAGERIE_ROB\super_templates\img11.jpg"
+
+    TEMPLATE_ANGLE_PATH = r"C:\Users\Romain\Desktop\Outils_d_imagerie_pour_la_robotique\PROJET_OUTILS_DIMAGERIE_ROB\super_templates\img2.jpg"
+    
+    if (test_predictions[i] == 1):  # image reconnue
+        if (y_test[i] == label_indices_cross[0]):  # rang 0 pour "label_indices_cross" : au pif
+            template = image.load_img(TEMPLATE_CROSS_PATH, target_size = (64, 64))
+            template_name = LABELS[0]
+        else if(y_test[i]== label_indices_T[0] ):  # rang 0 pour "label_indices_T" : au pif
+            template = image.load_img(TEMPLATE_T_PATH, target_size = (64, 64))
+            template_name = LABELS[1]
+        else if(y_test[i]== label_indices_angle[0] ):  # rang 0 pour "label_indices_angle" : au pif
+            template = image.load_img(TEMPLATE_ANGLE_PATH, target_size = (64, 64))
+            template_name = LABELS[2]
+
+        w, h = template.shape[::-1]
+        
+        method = eval('cv2.TM_CCOEFF')
+        res = cv2.matchTemplate(x_test[i],template,method)
+        min_val, max_val, min_loc, max_loc = cv2.minMaxLoc(res)
+
+        top_left = max_loc
+        bottom_right = (top_left[0] + w, top_left[1] + h)
+        
+        pos_centx=int((bottom_right[0]+top_left[0])/2)
+        pos_centy=int((bottom_right[1]+top_left[1])/2)
+
+        cv2.rectangle(frame,top_left, bottom_right, (0,255,0), 2)
+        resIM=res-np.amin(res)
+        VarMod=1000*(np.var(resIM)/1.02295316e+20)
+        
+        #print(np.mean(resIM*VarMod))
+        resIM=VarMod*resIM
+        if(np.mean(resIM)>15):
+            evaligne = template_name
+
+        else:
+            evaligne = "???"
+
+    
+        cv2.putText(x_test[i] ,evaligne, bottom_right, cv2.FONT_HERSHEY_SIMPLEX, 0.55, (0,255,0), 2)
+        
+        if(template_name = LABELS[0]):
+            cv2.putText(x_test[i] ,"X", (pos_centx, pos_centy), cv2.FONT_HERSHEY_SIMPLEX, 0.55, (0,255,0), 2)
+        if(template_name = LABELS[1]):
+            cv2.putText(x_test[i] ,"T", (pos_centx, pos_centy), cv2.FONT_HERSHEY_SIMPLEX, 0.55, (0,255,0), 2)
+        if(template_name = LABELS[1]):
+            cv2.putText(x_test[i] ,"L", (pos_centx, pos_centy), cv2.FONT_HERSHEY_SIMPLEX, 0.55, (0,255,0), 2)
+        # ou: cv2.line(x_test[i],(x1,y1), (x2,y2),(255,0,0),2)
+    
+
+    #figure.add_subplot(maximum_square, maximum_square, count)
+    plt.imshow(x_data[i, :, :, :])
+    plt.axis('off')
+    plt.title("whouaw" , fontsize=10)
+    plt.show()
+
+
+visualise_image_I(i, x_test, y_test, test_predictions, image, label_indices_cross, label_indices_T, label_indices_angle, LABELS)
+
+
+"""
+
 TEMPLATE_CROSS_PATH = r"C:\Users\Romain\Desktop\Outils_d_imagerie_pour_la_robotique\PROJET_OUTILS_DIMAGERIE_ROB\super_templates\img13.jpg"
 
 TEMPLATE_T_PATH = r"C:\Users\Romain\Desktop\Outils_d_imagerie_pour_la_robotique\PROJET_OUTILS_DIMAGERIE_ROB\super_templates\img11.jpg"
 
 TEMPLATE_ANGLE_PATH = r"C:\Users\Romain\Desktop\Outils_d_imagerie_pour_la_robotique\PROJET_OUTILS_DIMAGERIE_ROB\super_templates\img2.jpg"
+
 
 
 for i in y_test : #ou séléction de la i-ème frame  à visionner (sans doute mieux)
@@ -217,7 +361,7 @@ plt.axis('off')
 plt.title("whouaw" , fontsize=10)
 plt.show()
 
-
+"""
 
 
 
@@ -248,7 +392,7 @@ def visualize_incorrect_labels(x_data, y_real, y_predicted):
 
     plt.show()
 
-visualize_incorrect_labels(x_test, y_test, np.asarray(test_predictions).ravel())
+#visualize_incorrect_labels(x_test, y_test, np.asarray(test_predictions).ravel())
 
 
 #---------------------------------------------------------------------------------
