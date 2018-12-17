@@ -265,7 +265,7 @@ visualize_incorrect_labels(x_test, y_test, np.asarray(test_predictions).ravel())
 
 
 
-
+#   peut-être utiliser LIGNES SUIVANTES:
 
 
 """
