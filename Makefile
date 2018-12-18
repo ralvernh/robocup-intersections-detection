@@ -16,16 +16,21 @@ LDLIBS=\
 VIEWER= pvisu
 DATA= ../data
 DATA_2= ../data_2
-IMAGE= 072-rgb.png
+IMAGE= 145-rgb.png
+IMAGE_CHOSE = chose.png
 IMAGE_2= croix2-rgb.png
 
 #	072-rgb.png
+#	145-rgb.png
 BIN=\
 	lines-detector_v3 \
 	find_picture_motif_homography \
 	find_picture_motif_homography_v2 \
 	template_matching_opencv \
-	template_matching_opencv_v2
+	template_matching_opencv_v2 \
+	template_matching_opencv_v3 \
+	template_matching_opencv_v4 \
+	harris_detector
 
 #	harris_detector_v2 \
 #	harris_detector \
@@ -38,14 +43,16 @@ BIN=\
 all: $(BIN)
 
 .PHONY: test
-test:   lines-detector_v3  find_picture_motif_homography template_matching_opencv template_matching_opencv_v2
+test:   lines-detector_v3  find_picture_motif_homography template_matching_opencv template_matching_opencv_v2 harris_detector template_matching_opencv_v3 template_matching_opencv_v4
 
 	./lines-detector_v3 $(DATA)/$(IMAGE)
 	./find_picture_motif_homography $(DATA)/$(IMAGE) $(DATA_2)/$(IMAGE_2)
 	./template_matching_opencv $(DATA_2)/$(IMAGE) $(DATA_2)/$(IMAGE_2)
-	./template_matching_opencv_v2 $(DATA_2)/$(IMAGE)
+	./template_matching_opencv_v2 $(DATA)/$(IMAGE)
+	./template_matching_opencv_v3 $(DATA)/$(IMAGE)
+	./template_matching_opencv_v4 $(DATA)/$(IMAGE)
+	./harris_detector $(DATA)/$(IMAGE_CHOSE)
 
-#	./harris_detector $(DATA)/$(IMAGE)
 #	./lines-detector $(DATA)/$(IMAGE)
 #	./harris_detector_v2 $(DATA)/$(IMAGE)
 #	./lines-detector_v2 $(DATA)/$(IMAGE)
