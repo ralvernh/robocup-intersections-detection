@@ -18,7 +18,7 @@ using namespace std;
 
 
 /// Global Variables
-const int nb_templates = 13;
+const int nb_templates = 11;
 bool use_mask;
 Mat img; Mat templ[nb_templates]; Mat mask; Mat result[nb_templates];
 const char* image_window = "Source Image";
@@ -155,11 +155,11 @@ void Detection( int, void* )
       /// Show me what you got
       rectangle( img_display, matchLoc, Point( matchLoc.x + templ[k].cols , matchLoc.y + templ[k].rows ), Scalar(0, 255, 0), 2, 8, 0 );
 
-      if((1 <= k)&& (k <= 4))
+      if((1 <= k)&& (k <= 2))
         putText(img_display, motif_croix, Point( matchLoc.x + templ[k].cols/2 , matchLoc.y + templ[k].rows/2 ), FONT_HERSHEY_SIMPLEX, 0.75,  Scalar(0,0,255), 2);
-      else if((4 < k)&&( k<= 10))
+      else if((2 < k)&&( k<= 6))
         putText(img_display, motif_T, Point( matchLoc.x + templ[k].cols/2 , matchLoc.y + templ[k].rows/2 ), FONT_HERSHEY_SIMPLEX, 0.75,  Scalar(0,0,255), 2);
-      else if(10 < k)
+      else if(6 < k)
         putText(img_display, motif_angleDroit, Point( matchLoc.x + templ[k].cols/2 , matchLoc.y + templ[k].rows/2 ), FONT_HERSHEY_SIMPLEX, 0.75,  Scalar(0,0,255), 2);
 
     }
