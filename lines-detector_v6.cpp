@@ -13,7 +13,7 @@ int const max_lowThreshold = 100;
 int hightThreshold=63; //63
 int const min_hightThreshold = 100;
 
-int nooorme=40;
+int nooorme=90;
 int const max_nooorme=500;
 
 int low_h=30;
@@ -31,7 +31,7 @@ int const min_hight_v = 360;
 
 const char* window_name = "hello there";
 
-Mat src, HSV;
+Mat src, HSV, mat_input;
 
 //  https://www.codepool.biz/opencv-line-detection.html
 //  https://scholar.google.fr/scholar?q=opencv+intersection+detection&hl=fr&as_sdt=0&as_vis=1&oi=scholart
@@ -86,7 +86,7 @@ Mat Dilation( Mat image_input ,int dilation_size )
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void DetectLines( )
 {
-
+    mat_input=src.clone();
     vector<Mat> hsv_planes;
     split(HSV, hsv_planes);
     Mat h = hsv_planes[0]; // H channel
@@ -150,26 +150,7 @@ void DetectLines( )
     Mat image_lignes_rouge(rows,cols,CV_8UC1,Scalar(0,0,0));
     cvtColor(image_lignes_rouge, image_lignes_rouge, COLOR_GRAY2BGR);
 
-    ////////////////////////////////////////////////////////////////////////////////////////
-/*
-    // Standard Hough Line Transform
-    vector<Vec2f> linesss; // will hold the results of the detection
-    HoughLines(src, linesss, 1, CV_PI/180, 150, 10, 0 ); // runs the actual detection
 
-
-    // Draw the lines
-    for( size_t i = 0; i < linesss.size(); i++ ){
-      float rho = linesss[i][0], theta = linesss[i][1];
-      Point pt1, pt2;
-      double a = cos(theta), b = sin(theta);
-      double x0 = a*rho, y0 = b*rho;
-      pt1.x = cvRound(x0 + 1000*(-b));
-      pt1.y = cvRound(y0 + 1000*(a));
-      pt2.x = cvRound(x0 - 1000*(-b));
-      pt2.y = cvRound(y0 - 1000*(a));
-      line( cdst, pt1, pt2, Scalar(0,0,255), 3, 2); //LINE_AA
-    }
-  */
     ////////////////////////////////////////////////////////////////////////////////////////
 
     vector<Vec4i> lines;
@@ -185,7 +166,7 @@ void DetectLines( )
     {
         l = lines[i];
         //line(cdst, Point(l[0], l[1]), Point(l[2], l[3]), Scalar(0, 0, 255), 3, 2 );
-        line(image_lignes_rouge, Point(l[0], l[1]), Point(l[2], l[3]), Scalar(255, 255, 255), 3, 2 );
+        line(image_lignes_rouge, Point(l[0], l[1]), Point(l[2], l[3]), Scalar(0, 0, 255), 3, 2 );
 
         //sauvegarde des points des lignes
         pts1[r]=Point(l[0], l[1]);
@@ -204,7 +185,7 @@ for (int j = 0; j < r; j++){  //size_t  lines.size()
     pt2.x = lines[b][2];
     pt2.y = lines[b][3];
     if((sqrt(pow((pt1.x - pt2.x),2) + pow((pt1.y - pt2.y),2))) <= nooorme){
-        line(image_lignes_rouge, pt1, pt2, Scalar(255, 255, 255), 3, 2 );
+        line(image_lignes_rouge, pt1, pt2, Scalar(0, 0, 255), 3, 2 );
       }
     }
 }
@@ -217,7 +198,7 @@ for ( int j = 0; j < r; j++){
     pt2.x = lines[b][2];
     pt2.y = lines[b][3];
     if((sqrt(pow((pt1.x - pt2.x),2) + pow((pt1.y - pt2.y),2))) <= nooorme){
-        line(image_lignes_rouge, pt1, pt2, Scalar(255, 255, 255), 3, 2 );
+        line(image_lignes_rouge, pt1, pt2, Scalar(0, 0, 255), 3, 2 );
       }
     }
 }
@@ -230,29 +211,42 @@ for ( int j = 0; j < r; j++){
     pt2.x = lines[b][0];
     pt2.y = lines[b][1];
     if((sqrt(pow((pt1.x - pt2.x),2) + pow((pt1.y - pt2.y),2))) <= nooorme){
-        line(image_lignes_rouge, pt1, pt2, Scalar(255, 255, 255), 3, 2 );
+        line(image_lignes_rouge, pt1, pt2, Scalar(0, 0, 255), 3, 2 );
       }
     }
 }
 
 
-    /*
-    image_lignes_rouge = Dilation( image_lignes_rouge ,4 );
-    imshow("sourceName", src);
-    */
+
     //imshow("houghtlinesbefore", cdst);
     imshow("whouahh1", image_lignes_rouge);
 
-    //imshow(destName, cdst);
-    cvtColor(image_lignes_rouge, image_lignes_rouge, COLOR_BGR2GRAY);
+
     //Canny(image_lignes_rouge, image_lignes_rouge, 50, 200, 3);
     //image_lignes_rouge = Dilation( image_lignes_rouge ,3 );
 //---------------------------------------------------------------------------------------------------
 
-//---------------------------------------------------------------------------------------------------
-
-    //imshow("whouahh2", image_lignes_rouge);
     //imwrite( "../data/chose.png", image_lignes_rouge );
+
+    cout <<"rows"  << rows<<endl;
+    cout <<"cols"  <<cols <<endl;
+
+    Mat ch[3];
+    split(mat_input, ch);
+    cvtColor(image_lignes_rouge, image_lignes_rouge, COLOR_BGR2GRAY);
+    for(int M=0; M<rows; M++){
+      for(int W=0; W<cols; W++){
+          if(image_lignes_rouge.at<uchar>(M, W) >= 50){
+          ch[2].at<uchar>(M,W) = 255;
+        }
+      }
+    }
+
+  //mat_input=mat_input+image_lignes_rouge;
+    //mat_input.copyTo(image_lignes_rouge(Rect(0, 0, cols, rows)));
+
+    merge(ch, 3, mat_input);
+    imshow("FAIM !!! (fin)", mat_input);
 
 }
 
