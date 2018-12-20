@@ -27,6 +27,11 @@ make : lance la compilation des codes sélectionnés
 
 make test : lance leurs exécutions
 
+
+NB: pour les "matchingtemplate" (v3 et v4); si l'on souhaite rajouter d'autres templates : respecter l'ordre suivant : ANGLES, CROIX, T. et réadapter des indices pour les codes liés au matchingtemplate
+
+
+
 ---------------------------------------------------------------------------------------------------------------------------------
 
 codes python:
@@ -36,7 +41,7 @@ utiliser le jupyter notbook (ou autre...)
 ------------------------------------------------------------------------------------
 
 
-
+NB: pour le programme "classificateur.py" : changer les chemins d'accès aux répertoires d'accès et de copie: adaptés pour un cas bien précis et sous windows
 
 
 
