@@ -18,28 +18,30 @@ using namespace std;
 
 
 /// Global Variables
-const int nb_templates = 11;
+const int nb_templates = 13;
 bool use_mask;
 Mat img; Mat templ[nb_templates]; Mat mask; Mat result[nb_templates];
 const char* image_window = "Source Image";
 const char* result_window = "Result window";
-const char* motif_croix = "L";
-const char* motif_T = "X";
-const char* motif_angleDroit = "T";
-int minMatchQuality = 50;
+const char* motif_croix = "+";
+const char* motif_T = "T";
+const char* motif_angleDroit = "L";
 
-// NB: TOUJOURS INITIALISER LES TRACKBARS...
-int max_Trackbar = 100;
+int match_method=CV_TM_SQDIFF_NORMED;  // NB: TOUJOURS INITIALISER LES TRACKBARS...
+int max_Trackbar = 5; //5
+
+//debug sorry
+const char* zzzzzz[14] = {"1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14"} ;
 
 /// Function Headers
-void Detection( int, void* );
+void MatchingMethod( int, void* );
 
 /**
  * @function main
  */
 int main( int argc, char** argv )
 {
-  if (argc < 1)
+  if (argc < 2)
   {
     cout << "Not enough parameters" << endl;
     cout << "Usage:\n./MatchTemplate_Demo <image_name> [<mask_name>]" << endl;
@@ -50,7 +52,7 @@ int main( int argc, char** argv )
   img = imread( argv[1], CV_LOAD_IMAGE_COLOR );
   char chemin_super_templates[] = "../super_templates/img1.png";
 
-  //////////////////////////////////LECTURE_TEMPLATES/////////////////////////////////////
+  /////////////////////////////////////LECTURE_TEMPLATES//////////////////////////////////
   string string_tmp = "string";
   int len_srt;
   int chazam=0;
@@ -81,6 +83,16 @@ int main( int argc, char** argv )
   }
 //////////////////////////////////////////////////////////////////////////////////
 
+  if(argc > 2) {
+    use_mask = true;
+    mask = imread( argv[2], IMREAD_COLOR );
+  }
+
+  if(img.empty() || templ[0].empty() || (use_mask && mask.empty()))
+  {
+    cout << "Can't read one of the images" << endl;
+    return -1;
+  }
 
   /// Create windows
   namedWindow( image_window, WINDOW_AUTOSIZE );
@@ -88,9 +100,10 @@ int main( int argc, char** argv )
 
 
   /// Create Trackbar
-  createTrackbar( "seuil", image_window, &minMatchQuality, max_Trackbar, Detection );
+  const char* trackbar_label = "Method: \n 0: SQDIFF \n 1: SQDIFF NORMED \n 2: TM CCORR \n 3: TM CCORR NORMED \n 4: TM COEFF \n 5: TM COEFF NORMED";
+  createTrackbar( trackbar_label, image_window, &match_method, max_Trackbar, MatchingMethod );
 
-  Detection( 0, 0 );
+  MatchingMethod( 0, 0 );
 
 
   waitKey(0);
@@ -102,7 +115,7 @@ int main( int argc, char** argv )
  * @function MatchingMethod
  * @brief Trackbar callback
  */
-void Detection( int, void* )
+void MatchingMethod( int, void* )
 {
   Mat img_display;
   img.copyTo( img_display );
@@ -122,6 +135,10 @@ void Detection( int, void* )
     templ[k].convertTo(templ[k], img.type(), 1, 0 );
     //cvtColor(templ[k], templ[k], CV_GRAY2BGR);
 
+    cout<< img.type()<<endl;
+    cout<< templ[k].type()<<endl;
+    //imshow( "DEBUUUG", templ[k] );
+    //waitKey(0);
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     if(templ[k].type() != img.type()){
@@ -134,7 +151,15 @@ void Detection( int, void* )
 
 
     /// Do the Matching and Normalize
-    matchTemplate( img, templ[k], result[k], CV_TM_CCOEFF_NORMED);  //CV_TM_CCOEFF_NORMED
+    bool method_accepts_mask = (TM_SQDIFF == match_method || match_method == TM_CCORR_NORMED);
+
+    if (use_mask && method_accepts_mask)
+      //{ matchTemplate( img, templ, result, match_method, mask); }
+      { matchTemplate( img, templ[k], result[k], match_method); }
+    else
+      { matchTemplate( img, templ[k], result[k], match_method);}
+
+      //normalize( result[k], result[k], 0, 255, NORM_MINMAX, -1, Mat() );
 
     /// Localizing the best match with minMaxLoc
     double minVal; double maxVal; Point minLoc; Point maxLoc;
@@ -143,33 +168,42 @@ void Detection( int, void* )
     minMaxLoc( result[k], &minVal, &maxVal, &minLoc, &maxLoc,  Mat() );
     //Core.MinMaxLocResult mmr = Core.minMaxLoc(result);
 
+    double minMatchQuality = 0.5; // with CV_TM_SQDIFF_NORMED you could use 0.1
+
+
     normalize( result[k], result[k], 0, 255, NORM_MINMAX, -1, Mat() ); //then,for imshow
 
-    //when you use "CV_TM_CCOEFF_NORMED" you have to do:
-    matchLoc = maxLoc;
+    /// For SQDIFF and SQDIFF_NORMED, the best matches are lower values. For all the other methods, the higher the better
+    if( match_method  == CV_TM_SQDIFF || match_method == CV_TM_SQDIFF_NORMED )
+      { matchLoc = minLoc; }
+    else
+      { matchLoc = maxLoc; }
 
-    double seuiltmp = 0.5; //0.7
-    seuiltmp = minMatchQuality / 100.0000001;
+    //cout<<"qsb"<< minVal<<"sdfghjkl"<< maxVal<<endl;  //debug
 
-    if(maxVal > seuiltmp){  
+
+    if(maxVal > minMatchQuality){  
       /// Show me what you got
       rectangle( img_display, matchLoc, Point( matchLoc.x + templ[k].cols , matchLoc.y + templ[k].rows ), Scalar(0, 255, 0), 2, 8, 0 );
 
-      if((1 <= k)&& (k <= 2))
-        putText(img_display, motif_croix, Point( matchLoc.x + templ[k].cols/2 , matchLoc.y + templ[k].rows/2 ), FONT_HERSHEY_SIMPLEX, 0.75,  Scalar(0,0,255), 2);
-      else if((2 < k)&&( k<= 6))
-        putText(img_display, motif_T, Point( matchLoc.x + templ[k].cols/2 , matchLoc.y + templ[k].rows/2 ), FONT_HERSHEY_SIMPLEX, 0.75,  Scalar(0,0,255), 2);
-      else if(6 < k)
-        putText(img_display, motif_angleDroit, Point( matchLoc.x + templ[k].cols/2 , matchLoc.y + templ[k].rows/2 ), FONT_HERSHEY_SIMPLEX, 0.75,  Scalar(0,0,255), 2);
-
+      if((1 <= k)&& (k <= 4))
+        //putText(img_display, motif_croix, matchLoc, FONT_HERSHEY_SIMPLEX, 0.75,  Scalar(255,0,0), 2);
+        putText(img_display, zzzzzz[k-1], matchLoc, FONT_HERSHEY_SIMPLEX, 0.75,  Scalar(255,0,0), 2);
+      else if((4 < k)&&( k<= 10))
+        //putText(img_display, motif_T, matchLoc, FONT_HERSHEY_SIMPLEX, 0.75,  Scalar(255,0,0), 2);
+        putText(img_display, zzzzzz[k-1], matchLoc, FONT_HERSHEY_SIMPLEX, 0.75,  Scalar(255,0,0), 2);
+      else if(10 < k)
+        //putText(img_display, motif_angleDroit, matchLoc, FONT_HERSHEY_SIMPLEX, 0.75,  Scalar(255,0,0), 2);
+        putText(img_display, zzzzzz[k-1], matchLoc, FONT_HERSHEY_SIMPLEX, 0.75,  Scalar(255,0,0), 2);
     }
+
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
   }
   imshow( image_window, img_display );
   imwrite( "../templatematching.png", img_display );
-  //imshow( result_window, result[1] );
+  imshow( result_window, result[1] );
 
   return;
 }

@@ -24,6 +24,9 @@ IMAGE_2= croix2-rgb.png
 #	145-rgb.png
 BIN=\
 	lines-detector_v3 \
+	lines-detector_v4 \
+	lines-detector_v5 \
+	lines-detector_v6 \
 	find_picture_motif_homography \
 	find_picture_motif_homography_v2 \
 	template_matching_opencv \
@@ -36,29 +39,30 @@ BIN=\
 #	harris_detector \
 #	lines-detector \
 #	lines-detector_v2 \
-#	bannnannne \
+
 
 
 .PHONY: all clean cleanall
 all: $(BIN)
 
 .PHONY: test
-test:   lines-detector_v3  find_picture_motif_homography template_matching_opencv template_matching_opencv_v2 harris_detector template_matching_opencv_v3 template_matching_opencv_v4
+test:   lines-detector_v3  find_picture_motif_homography template_matching_opencv template_matching_opencv_v2 harris_detector template_matching_opencv_v3 template_matching_opencv_v4 lines-detector_v4 lines-detector_v5 lines-detector_v6
 
-	./lines-detector_v3 $(DATA)/$(IMAGE)
-	./find_picture_motif_homography $(DATA)/$(IMAGE) $(DATA_2)/$(IMAGE_2)
-	./template_matching_opencv $(DATA_2)/$(IMAGE) $(DATA_2)/$(IMAGE_2)
-	./template_matching_opencv_v2 $(DATA)/$(IMAGE)
-	./template_matching_opencv_v3 $(DATA)/$(IMAGE)
-	./template_matching_opencv_v4 $(DATA)/$(IMAGE)
-	./harris_detector $(DATA)/$(IMAGE_CHOSE)
+	./lines-detector_v6 $(DATA_2)/$(IMAGE)
+	./template_matching_opencv_v4 $(DATA_2)/$(IMAGE)
 
+#	./harris_detector $(DATA)/$(IMAGE_CHOSE)
 #	./lines-detector $(DATA)/$(IMAGE)
 #	./harris_detector_v2 $(DATA)/$(IMAGE)
 #	./lines-detector_v2 $(DATA)/$(IMAGE)
-#	./bannnannne $(DATA)/$(IMAGE)
+#	./lines-detector_v3 $(DATA)/$(IMAGE)
+#	./lines-detector_v4 $(DATA)/$(IMAGE)
+#	./lines-detector_v5 $(DATA)/$(IMAGE)
 #	./find_picture_motif_homography_v2 $(DATA)/$(IMAGE) $(DATA_2)/$(IMAGE_2)
-#view-2.png
+#	./find_picture_motif_homography $(DATA)/$(IMAGE) $(DATA_2)/$(IMAGE_2)
+#	./template_matching_opencv $(DATA_2)/$(IMAGE) $(DATA_2)/$(IMAGE_2)
+#	./template_matching_opencv_v2 $(DATA)/$(IMAGE)
+#	./template_matching_opencv_v3 $(DATA)/$(IMAGE)
 
 clean:
 	$(RM) *~ *.png

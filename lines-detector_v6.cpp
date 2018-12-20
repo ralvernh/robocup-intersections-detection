@@ -22,7 +22,7 @@ int low_v=0;
 int const max_low_h = 360;
 int const max_low_s = 360;
 int const max_low_v = 360;
-int hight_h=61; //96
+int hight_h=61; //96 //61
 int hight_s=360;
 int hight_v=210;
 int const min_hight_h = 360;
@@ -177,44 +177,44 @@ void DetectLines( )
     cout<<"debug" << lines[3] <<endl;
 
 
-for (int j = 0; j < r; j++){  //size_t  lines.size()
-  for (int b = 0; b < r; b++){
-    Point pt1, pt2;
-    pt1.x = lines[j][0];
-    pt1.y = lines[j][1];
-    pt2.x = lines[b][2];
-    pt2.y = lines[b][3];
-    if((sqrt(pow((pt1.x - pt2.x),2) + pow((pt1.y - pt2.y),2))) <= nooorme){
-        line(image_lignes_rouge, pt1, pt2, Scalar(0, 0, 255), 3, 2 );
-      }
-    }
-}
+	for (int j = 0; j < r; j++){  //size_t  lines.size()
+		for (int b = 0; b < r; b++){
+			Point pt1, pt2;
+			pt1.x = lines[j][0];
+			pt1.y = lines[j][1];
+			pt2.x = lines[b][2];
+			pt2.y = lines[b][3];
+			if((sqrt(pow((pt1.x - pt2.x),2) + pow((pt1.y - pt2.y),2))) <= nooorme){
+				line(image_lignes_rouge, pt1, pt2, Scalar(0, 0, 255), 3, 2 );
+				}
+			}
+		}
 //---------------------------------------------------------------------------------------------------------
-for ( int j = 0; j < r; j++){
-  for ( int b = 0; b < r; b++){
-    Point pt1, pt2;
-    pt1.x = lines[j][2];
-    pt1.y = lines[j][3];
-    pt2.x = lines[b][2];
-    pt2.y = lines[b][3];
-    if((sqrt(pow((pt1.x - pt2.x),2) + pow((pt1.y - pt2.y),2))) <= nooorme){
-        line(image_lignes_rouge, pt1, pt2, Scalar(0, 0, 255), 3, 2 );
-      }
-    }
-}
+	for ( int j = 0; j < r; j++){
+		for ( int b = 0; b < r; b++){
+			Point pt1, pt2;
+			pt1.x = lines[j][2];
+			pt1.y = lines[j][3];
+			pt2.x = lines[b][2];
+			pt2.y = lines[b][3];
+			if((sqrt(pow((pt1.x - pt2.x),2) + pow((pt1.y - pt2.y),2))) <= nooorme){
+				line(image_lignes_rouge, pt1, pt2, Scalar(0, 0, 255), 3, 2 );
+				}
+			}
+		}
 //---------------------------------------------------------------------------------------------------------
-for ( int j = 0; j < r; j++){
-  for ( int b = 0; b < r; b++){
-    Point pt1, pt2;
-    pt1.x = lines[j][0];
-    pt1.y = lines[j][1];
-    pt2.x = lines[b][0];
-    pt2.y = lines[b][1];
-    if((sqrt(pow((pt1.x - pt2.x),2) + pow((pt1.y - pt2.y),2))) <= nooorme){
-        line(image_lignes_rouge, pt1, pt2, Scalar(0, 0, 255), 3, 2 );
-      }
-    }
-}
+	for ( int j = 0; j < r; j++){
+		for ( int b = 0; b < r; b++){
+			Point pt1, pt2;
+			pt1.x = lines[j][0];
+			pt1.y = lines[j][1];
+			pt2.x = lines[b][0];
+			pt2.y = lines[b][1];
+			if((sqrt(pow((pt1.x - pt2.x),2) + pow((pt1.y - pt2.y),2))) <= nooorme){
+				line(image_lignes_rouge, pt1, pt2, Scalar(0, 0, 255), 3, 2 );
+				}
+			}
+		}
 
 
 
@@ -237,12 +237,14 @@ for ( int j = 0; j < r; j++){
     for(int M=0; M<rows; M++){
       for(int W=0; W<cols; W++){
           if(image_lignes_rouge.at<uchar>(M, W) >= 50){
-          ch[2].at<uchar>(M,W) = 255;
+            ch[0].at<uchar>(M,W) = 0;
+            ch[1].at<uchar>(M,W) = 0;
+            ch[2].at<uchar>(M,W) = 255;
         }
       }
     }
 
-  //mat_input=mat_input+image_lignes_rouge;
+	//mat_input=mat_input+image_lignes_rouge;
     //mat_input.copyTo(image_lignes_rouge(Rect(0, 0, cols, rows)));
 
     merge(ch, 3, mat_input);
@@ -278,7 +280,7 @@ int main(int argc, char** argv)
     cvtColor(src, HSV, CV_BGR2HSV);
 
     namedWindow( window_name, CV_WINDOW_AUTOSIZE );
-    /// TRACKBARS HSV
+    // TRACKBARS HSV
     createTrackbar( "H_min", window_name, &low_h, max_low_h, DetectLines_demo );
     createTrackbar( "H_max", window_name, &hight_h, min_hight_h, DetectLines_demo );
 
@@ -292,11 +294,11 @@ int main(int argc, char** argv)
     createTrackbar( "Min Threshold:", window_name, &lowThreshold, max_lowThreshold, DetectLines_demo );
     createTrackbar( "Max Threshold:", window_name, &hightThreshold, min_hightThreshold, DetectLines_demo );
 
+	//	TRACKBARS reliage lignes
     createTrackbar( "seuil norme:", window_name, &nooorme, max_nooorme, DetectLines_demo );
 
     DetectLines_demo(0,0);
-    //DetectLines(argv[1], "line src", "line dest");
-    //DetectLines("..\\2.jpg", "door src", "door dest");
+
     waitKey();
 
     return 0;
