@@ -2,7 +2,7 @@
 
 	-> codes c++ et makefile (Dossier "CODES") 
 	
-	-> codes python (Dossier "")
+	-> codes python 
 	
 	-> nécessité d'un dossier "data_2" : y intégrer les images à visualiser (téléchargées des archives du projet) 
 
