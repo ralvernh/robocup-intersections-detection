@@ -50,8 +50,8 @@ all: $(BIN)
 test:    find_picture_motif_homography template_matching_opencv template_matching_opencv_v2 harris_detector template_matching_opencv_v3 template_matching_opencv_v4 lines-detector_v4 lines-detector_v5 lines-detector_v6 lines-detector_v7
 
 	./lines-detector_v6 $(DATA_2)/$(IMAGE)
-	./lines-detector_v7 $(DATA_2)/$(IMAGE)
 	./template_matching_opencv_v4 $(DATA_2)/$(IMAGE)
+	./lines-detector_v7 $(DATA_2)/$(IMAGE)
 
 
 #	./harris_detector $(DATA)/$(IMAGE_CHOSE)
