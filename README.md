@@ -1,6 +1,45 @@
 # robocup-intersections-detection
 
--> pour 'template_matching_opencv_v2.cpp' : se créer préalablement un dossier "super_templates", contenant les templates à détecter
+	-> codes c++ et makefile (Dossier "CODES") 
+	
+	-> codes python (Dossier "")
+	
+	-> nécessité d'un dossier "data_2" : y intégrer les images à visualiser (téléchargées des archives du projet) 
+
+	-> nécessité d'un dossier "super_templates"; contenant les templates à reconnaitre (uniquement pour les différentes versions de "matchingTemplate")
+
+--------------------------------------------------------------------------------------------------------------------------------
+Pour le makefile;
+____________________
+
+	1) sélectionner le dossier contenant les images à exécuter dans le programme "data", "data_2" ou autre ...
+	
+	2) sélectionner l'image au format png à exécuter (dans le dossier choisi précédamment)
+	
+	3) sélectionner les codes à exécuter ou non
+	
+codes c++:
+____________
+	
+Dans un terminal, se placer dans le dossier CODES.
+
+make : lance la compilation des codes sélectionnés
+
+make test : lance leurs exécutions
+
+---------------------------------------------------------------------------------------------------------------------------------
+
+codes python:
+______________
+
+utiliser le jupyter notbook (ou autre...)
+------------------------------------------------------------------------------------
+
+
+
+
+
+
 
 
 -> essayer d'implémenter un cnn + tracking: sources utiles: 
